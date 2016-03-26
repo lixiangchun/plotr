@@ -9,7 +9,7 @@ ggsurv(s, col.surv = 1, lty.surv = 1, censor = TRUE, col.cens = 1,
   median = FALSE, atrisk = TRUE, col.atrisk, pval, basehaz = FALSE, ticks,
   median.ticks = TRUE, xlab, ylab, main, xlim, ylim, legend = "right",
   legend.labels, grid = FALSE, ggdefault = FALSE, plot.margin = NULL,
-  table.margin = NULL, ...)
+  table.margin = NULL, lwd.size=1.3, cens.size=2.5, pval.size=6, ...)
 }
 \arguments{
 \item{s}{\code{\link{survfit}} or \code{survfit.cox} object}
@@ -90,6 +90,10 @@ details}
 
 \item{table.margin}{numeric; extra "lines" added to left margin of at risk
 table; see details}
+
+\item{lwd.size}{numeric; the thickness of survival curve. Added by Li X.C.}
+\item{cens.size}{numeric; the size of censored marker. Added by Li X.C.}
+\item{pval.size}{numeric; the size of text of pvalue. Added by Li X.C.}
 
 \item{...}{for backwards compatibility with deprecated arguments}
 }

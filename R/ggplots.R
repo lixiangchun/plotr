@@ -261,7 +261,7 @@ ggsurv <- function(s,
                    grid = FALSE, ggdefault = FALSE,
                    
                    # other options
-                   plot.margin = NULL, table.margin = NULL, ...) {
+                   plot.margin = NULL, table.margin = NULL, lwd.surv=1.3, cens.size=1, pval.size=6, ...) {
   
   ## to do:
   # y axis ticks
@@ -322,7 +322,7 @@ ggsurv <- function(s,
                     replaced = legend.labels)
     cat('\nstrata labels recoded as follows:\n\n')
     print(do.call(data.frame, recodes))
-    if (inherits(res <- try(rawr::recoder), 'try-error')) {
+    if (inherits(res <- try(rawr::recoder, silent=TRUE), 'try-error')) {
       survdat$strata <- factor(survdat$strata, 
                                levels = levels(survdat$strata),
                                labels = legend.labels)
@@ -355,16 +355,16 @@ ggsurv <- function(s,
       if (is.null(col.cens) & !is.null(col.surv)) {
         tmp <- tmp + geom_point(data = subset(survdat, n.censor > 0), 
                                 aes(x = time, y = surv), 
-                                colour = col.surv, shape = mark) 
+                                colour = col.surv, shape = mark, size=cens.size)
       } else { 
         if (is.null(col.cens) & is.null(col.surv)) {
           tmp <- tmp + geom_point(data = subset(survdat, n.censor > 0),
                                   aes(x = time, y = surv),
-                                  colour = 'black', shape = mark)
+                                  colour = 'black', shape = mark, size=cens.size)
         } else {
           tmp <- tmp + geom_point(data = subset(survdat, n.censor > 0),
                                   aes(x = time, y = surv),
-                                  colour = col.cens, shape = mark)
+                                  colour = col.cens, shape = mark, size=cens.size)
         }
       }
     }
@@ -433,17 +433,17 @@ ggsurv <- function(s,
     tmp <- ggplot(data = survdat, aes(x = time, y = surv, 
                                       group = strata, colour = strata)) +
       geom_step(aes(colour = strata, group = strata, linetype = strata), 
-                direction = 'hv') + col.survs + lty.survs
+                direction = 'hv', size=lwd.surv) + col.survs + lty.survs ##+ scale_size_manual(values=lwd.surv)
     # add censored observations
     if (censor) {
       if (is.null(col.cens)) {
         tmp <- tmp + geom_point(data = subset(survdat, n.censor > 0), 
                                 aes(x = time, y = surv, colour = strata, 
-                                    group = strata), shape = mark) 
+                                    group = strata), shape = mark, size=cens.size) 
       } else {
         tmp <- tmp + geom_point(data = subset(survdat, n.censor > 0), 
                                 aes(x = time, y = surv, colour = strata, 
-                                    group = strata, shape = strata)) +
+                                    group = strata, shape = strata), size=cens.size) +
           # scale_colour_manual(values = col.cens) +
           scale_shape_manual(values = marks)
       }
@@ -539,8 +539,8 @@ ggsurv <- function(s,
     sdiff <- survdiff(eval(s$call$formula), data = eval(s$call$data), rho = 0)
     pval.chisq <- pchisq(sdiff$chisq, length(sdiff$n) - 1, lower.tail = FALSE)
     pvaltxt <- ifelse(pval.chisq < 0.001, 'p < 0.001', 
-                      paste('p =', signif(pval.chisq, 3)))
-    tmp <- tmp + annotate('text', x = pval[1], y = pval[2], label = pvaltxt)
+                      paste('Log-rank test\np =', signif(pval.chisq, 3)))
+    tmp <- tmp + annotate(geom='text', x = pval[1], y = pval[2], label = pvaltxt, size=pval.size)
     print(sdiff)
   }
   
